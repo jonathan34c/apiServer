@@ -1,0 +1,12 @@
+apiVersion: linkerd.io/v1alpha2
+kind: ServiceProfile
+metadata:
+  name: my-service-profile
+  namespace: my-namespace
+spec:
+  routes:
+  - condition:
+      method: GET
+      path: "/my-path"
+    name: my-route
+    isRetryable: true
