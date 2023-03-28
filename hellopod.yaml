@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-app
+  namespace:
+spec:
+  selector:
+    matchLabels:
+      app: hello
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: hello
+    spec:
+      containers:
+      - name: hello
+        image: jonathan34c.azurecr.io/jonachang/image:imagetag
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-service
+  namespace:
+  labels:
+    app: hello
+spec:
+  type: ClusterIP
+  selector:
+    app: hello
+  ports:
+  - port: 80
+    targetPort: 8888
+    protocol: TCP
+    name: http
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/auth-tls-verify-client: \"on\"
+    nginx.ingress.kubernetes.io/auth-tls-secret: \"default/my-certs\"
+  name: hello-app-ingress
+  namespace: default 
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - localhost
+    secretName: my-certs
+  rules:
+  - host: "localhost"
+    http:
+      paths:
+        - pathType: Prefix
+          path: "/"
+          backend:
+            service:
+              name: hello-service
+              port:
+                number: 80
+

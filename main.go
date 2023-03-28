@@ -42,7 +42,7 @@ func main() {
 	router.GET("/apps", getAppss)
 	router.POST("/apps", postApps)
 
-	router.Run("localhost:8080")
+	router.Run("localhost:8888")
 }
 
 func getAppss(c *gin.Context) {
