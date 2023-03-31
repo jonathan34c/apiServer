@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: hello-app
+  name: api-server
   namespace:
 spec:
   selector:
@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: hello
-        image: jonathan34c.azurecr.io/jonachang/image:imagetag
+        image: jonachang.azurecr.io/apiserver:one
         resources:
           requests:
             cpu: 100m
@@ -44,7 +44,7 @@ spec:
     app: hello
   ports:
   - port: 80
-    targetPort: 8888
+    targetPort: 8080
     protocol: TCP
     name: http
 
