@@ -1,0 +1,10 @@
+apiVersion: policy.linkerd.io/v1beta1
+kind: Server
+metadata:
+  name: nginx-server-test
+spec:
+  podSelector:
+    matchLabels:
+      run: fixpod
+  port: 80
+  proxyProtocol: "HTTP/2"
