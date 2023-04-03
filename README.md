@@ -61,3 +61,4 @@
 * https://devopscube.com/kubernetes-ingress-tutorial/
 * https://www.digitalocean.com/community/tutorials/how-to-install-and-use-linkerd-with-kubernetes
 * https://blog.baeke.info/2020/12/07/certificates-with-azure-key-vault-and-nginx-ingress-controller/
+* https://blog.devops.dev/linkerd-authorization-policies-authorization-as-a-microservice-d48675512c0a
