@@ -1,0 +1,12 @@
+apiVersion: linkerd.io/v1alpha2
+kind: ServiceProfile
+metadata:
+  name: my-backend-api-profile
+spec:
+  routes:
+  - name: getapps
+    isRetryable: true # Define it's safe to retry this route
+    timeout: 100ms # Define a timeout for this route
+    condition:
+      method: GET
+      pathRegex: /apps

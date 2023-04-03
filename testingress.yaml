@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: testingress
+  annotations:
+    kubernetes.io/ingress.class: nginx
+spec:
+  tls:
+  - hosts:
+    - test.poc.info
+    secretName: nginx-cert
+  rules:
+  - host: test.poc.info
+    http:
+      paths:
+      - pathType: Prefix
+        path: /
+        backend:
+          service:
+              name: testservice
+              port:
+                number: 80

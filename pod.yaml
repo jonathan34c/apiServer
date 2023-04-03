@@ -1,19 +1,10 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: v1
+kind: Pod
 metadata:
-  name: apiserver-deploy
+  name: testpod
 spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: apiserver
-  template:
-    metadata:
-      labels:
-        app: apiserver
-    spec:
-      containers:
-        - name: apiserver-container
-          image: jonathan34c.azurecr.io/apiserver:tool
-          ports:
-            - containerPort: 8080
+  containers:
+    - name: testpod
+      image: jonathan34c.azurecr.io/apiserver:tool
+      ports:
+        - containerPort: 80

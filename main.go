@@ -22,6 +22,7 @@ type app struct {
 	Description string       `json:"description"`
 }
 
+// .net.http
 var apps = []app{
 	{Title: "Valid App 1",
 		Version: "0.0.1",
@@ -42,7 +43,7 @@ func main() {
 	router.GET("/apps", getAppss)
 	router.POST("/apps", postApps)
 
-	router.Run("localhost:8080")
+	router.Run(":8080")
 }
 
 func getAppss(c *gin.Context) {
