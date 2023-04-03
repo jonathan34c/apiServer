@@ -35,8 +35,13 @@
 
 * replace pod policy by adding server to pod yaml file
 ```
-"spec": { "serviceAccount": "curl-meshtls-test" }
+kubectl delete pod nginx2
+kubectl run nginx2 --image=nginx --port=80 --overrides='{ "spec": { "serviceAccount": "curl-meshtls-test" }  }'
+kubectl get pods -o yaml | linkerd inject - | kubectl replace --force -f -
 ``` 
+* run the curl command in step 4 with the newly created pod to see the result 
+![Screenshot 2023-04-03 163428](https://user-images.githubusercontent.com/8307131/229649078-af43773b-6104-45dc-a210-3ff29d04f102.png)
+
 
 # 6. Certificates with Azure Key Vault and Nginx Ingress Controller
 * [Install nginx ingress controller ](https://kubernetes.github.io/ingress-nginx/deploy/)
