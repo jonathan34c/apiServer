@@ -31,6 +31,12 @@
 * inject linkerd ```kubectl get deployments -n [namespace name] -o yaml | linkerd inject - | kubectl apply -f -```
 * checkout linkerd dashboard at ```linkerd dashboard```
 ![Screenshot 2023-04-03 105506](https://user-images.githubusercontent.com/8307131/229588898-21778d87-32d4-495e-86b3-ce2854a67aa5.png)
+* apply the authrization policy with https://github.com/jonathan34c/apiServer/blob/main/testauth.yaml https://github.com/jonathan34c/apiServer/blob/main/testcurl.yaml and https://github.com/jonathan34c/apiServer/blob/main/testnginxserver.yaml
+
+* replace pod policy by adding server to pod yaml file
+```
+"spec": { "serviceAccount": "curl-meshtls-test" }
+``` 
 
 # 6. Certificates with Azure Key Vault and Nginx Ingress Controller
 * [Install nginx ingress controller ](https://kubernetes.github.io/ingress-nginx/deploy/)
