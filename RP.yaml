@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rp  
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rp
+  template:
+    metadata:
+      labels:
+        app: rp
+    spec:
+      containers:
+      - name: rp
+        image: mcr.microsoft.com/azuredocs/aks-helloworld:v1
+        ports:
+        - containerPort: 80
+        env:
+        - name: TITLE
+          value: "Resource Provider"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rp  
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+  selector:
+    app: rp
