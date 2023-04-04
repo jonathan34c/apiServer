@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ga  
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ga
+  template:
+    metadata:
+      labels:
+        app: ga
+    spec:
+      containers:
+      - name: ga
+        image: mcr.microsoft.com/azuredocs/aks-helloworld:v1
+        ports:
+        - containerPort: 80
+        env:
+        - name: TITLE
+          value: "Geneva Action"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ga  
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+  selector:
+    app: ga
