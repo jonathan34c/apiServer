@@ -44,19 +44,58 @@ kubectl get pods -o yaml | linkerd inject - | kubectl replace --force -f -
 
 
 # 6. Certificates with Azure Key Vault and Nginx Ingress Controller
-* [Install nginx ingress controller ](https://kubernetes.github.io/ingress-nginx/deploy/)
-* [install akv2k8s controller](https://akv2k8s.io/)
-* Creating the certificate in Azure Key Vault
-* sync the certificate with [yaml](https://github.com/jonathan34c/apiServer/blob/main/testcertificate.yaml)
-* check if the certificate has been sync using krew plugin ``` kubectl view-cert```
+* install nginx ingress controller 
+```
+NAMESPACE=ingress-nginx
 
-![Screenshot 2023-04-03 112732](https://user-images.githubusercontent.com/8307131/229596100-09696550-c3fc-4114-9b9f-d772c6a513aa.png)
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+helm repo update
 
-# 7. Use the secret you sync with akv2k8s with ingress
-* follow [testingress yaml](https://github.com/jonathan34c/apiServer/blob/main/testingress.yaml) and sync the certificate 
-* after sync with akv2k8s, you can double check with ```kubectl get ingress```
-![Screenshot 2023-04-03 113504](https://user-images.githubusercontent.com/8307131/229597025-ca925378-1dfe-4f9b-8cd2-53e97771f3ec.png)
+helm install ingress-nginx ingress-nginx/ingress-nginx \
+  --create-namespace \
+  --namespace $NAMESPACE \
+  --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-load-balancer-health-probe-request-path"=/healthz
+ ```
+ 
+* follow step to get the secret using [cli driver](https://learn.microsoft.com/en-us/azure/aks/csi-secrets-store-driver) 
+* obtain xxx.crt and xxx.key by
+```
+export CERT_NAME=aks-ingress-cert
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+    -out aks-ingress-tls.crt \
+    -keyout aks-ingress-tls.key \
+    -subj "/CN=demo.azure.com/O=aks-ingress-tls"
+```
 
+```
+export AKV_NAME="[YOUR AKV NAME]"
+openssl pkcs12 -export -in aks-ingress-tls.crt -inkey aks-ingress-tls.key  -out $CERT_NAME.pfx
+```
+
+use cli to get the certificate
+```
+az keyvault certificate import --vault-name $AKV_NAME -n $CERT_NAME -f $CERT_NAME.pfx
+```
+* after obtain the crtificate and key, create your secret by 
+```
+kubectl create secret tls ingress-cert --namespace [namespace] --key=[keyname].key --cert=[certname].crt -o yaml
+```
+* double check if the scret has created correctly 
+```
+kubectl get secret
+```
+
+![Screenshot 2023-04-05 152438](https://user-images.githubusercontent.com/8307131/230225123-315755f5-88a1-4aba-a606-d829f98e061e.png)
+
+* apply secret to your [ingress controller](https://github.com/jonathan34c/apiServer/blob/main/ingress.yaml). remember to add secret name in "secrectname" part
+
+* apply changes, and see ithe external ip by ```kubectl get services -n [namespace]```
+
+![Screenshot 2023-04-05 152705](https://user-images.githubusercontent.com/8307131/230225436-638864cd-b6e9-46be-a348-dbafce5df2d8.png)
+
+* finally, check the coonection by ```curl -v -k --resolve [your difine address]:443:[external ip from last step] https://[your difine address]```
+
+![Screenshot 2023-04-05 143740](https://user-images.githubusercontent.com/8307131/230225595-f16e4042-e773-4a1f-acb6-d727aec47db8.png)
 
 # Trouble shooting 
 * if encounter ```ImagePullBackOff``` error for pod. Remember need to verified your docker image on azure using ```az aks update -n [resource-group name] -g [registry name] --attach-acr [registry name] ```
