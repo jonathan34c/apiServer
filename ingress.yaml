@@ -8,6 +8,10 @@ metadata:
     nginx.ingress.kubernetes.io/rewrite-target: /$2
 spec:
   ingressClassName: nginx
+  tls:
+  - hosts:
+    - aro-rp-dns
+    secretName: ingress-cert
   rules:
   - http:
       paths:

@@ -1,0 +1,8 @@
+# ignore ALL .pfx files
+*.pfx
+
+# ignore ALL .crt files
+*.crt
+
+# ignore ALL .key files
+*.key
