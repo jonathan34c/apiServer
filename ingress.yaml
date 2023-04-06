@@ -10,7 +10,7 @@ spec:
   ingressClassName: nginx
   tls:
   - hosts:
-    - aro-rp-dns
+    - arorp.westus3.cloudapp.azure.com
     secretName: ingress-cert
   rules:
   - http:

@@ -12,6 +12,7 @@ spec:
       labels:
         app: ga
     spec:
+      serviceAccountName: curl-meshtls-test
       containers:
       - name: ga
         image: mcr.microsoft.com/azuredocs/aks-helloworld:v1

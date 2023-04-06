@@ -97,6 +97,28 @@ kubectl get secret
 
 ![Screenshot 2023-04-05 143740](https://user-images.githubusercontent.com/8307131/230225595-f16e4042-e773-4a1f-acb6-d727aec47db8.png)
 
+# DNS
+* get resource group name by 
+```
+kubectl --namespace ingress-basic get services -o wide -w ingress-nginx-controller
+```
+* create public static ip
+```
+az network public-ip create --resource-group MC_myResourceGroup_myAKSCluster_eastus --name myAKSPublicIP --sku Standard --allocation-method static --query publicIp.ipAddress -o tsv
+```
+* set the domain name 
+```
+DNS_LABEL="<DNS_LABEL>"
+NAMESPACE="ingress-basic"
+STATIC_IP=<STATIC_IP>
+
+helm upgrade ingress-nginx ingress-nginx/ingress-nginx \
+  --namespace $NAMESPACE \
+  --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-dns-label-name"=$DNS_LABEL \
+  --set controller.service.loadBalancerIP=$STATIC_IP
+```
+* visit your set domaing by http://[domain name].westus3.cloudapp.azure.com
+
 # Trouble shooting 
 * if encounter ```ImagePullBackOff``` error for pod. Remember need to verified your docker image on azure using ```az aks update -n [resource-group name] -g [registry name] --attach-acr [registry name] ```
 
