@@ -5,6 +5,6 @@ metadata:
 spec:
   containers:
     - name: testpod
-      image: jonathan34c.azurecr.io/apiserver:tool
+      image: mcr.microsoft.com/azuredocs/aks-helloworld:v1
       ports:
         - containerPort: 80
