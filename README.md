@@ -122,6 +122,27 @@ helm upgrade ingress-nginx ingress-nginx/ingress-nginx \
 # Trouble shooting 
 * if encounter ```ImagePullBackOff``` error for pod. Remember need to verified your docker image on azure using ```az aks update -n [resource-group name] -g [registry name] --attach-acr [registry name] ```
 
+# Create secret for tls
+* folow [instruction](https://learn.microsoft.com/en-us/azure/aks/ingress-tls?tabs=azure-cli) to create secret for tls
+* note that since the helm has updated, the secret type will be "helm.sh/release.v1" instead of  kubernetes.io/tls
+* add the secret to tls [secret](https://github.com/jonathan34c/apiServer/blob/83cf8cc3e8c7c692a49ab0e8ac86a537b4efbf33/ingress.yaml#L18)
+* apply ingress.yaml
+* visit the dns domain to test it out
+
+# Client certifitcate 
+* create certificate authority``` openssl req -x509 -sha256 -newkey rsa:4096 -keyout ca.key -out ca.crt -days 356 -nodes -subj '/CN=My Cert Authority'''' 
+* apply CA as secret ```kubectl create secret generic ca-secret --from-file=ca.crt=ca.crt -n [namespace]```
+* create cert sigiing request ``` openssl req -new -newkey rsa:4096 -keyout client.key -out client.csr -nodes -subj ‘/CN=My Client’```
+* add following to [ingress.yaml](https://github.com/jonathan34c/apiServer/blob/83cf8cc3e8c7c692a49ab0e8ac86a537b4efbf33/ingress.yaml#L9) ``` nginx.ingress.kubernetes.io/auth-tls-pass-certificate-to-upstream: "true"
+    nginx.ingress.kubernetes.io/auth-tls-secret: default/ca-secret
+    nginx.ingress.kubernetes.io/auth-tls-verify-client: "on"
+    nginx.ingress.kubernetes.io/auth-tls-verify-depth: "1"```
+* test tout by first visit the domain, it would request a certificate ``` curl -k https://aro.westus3.cloudapp.azure.com/ga```  ![Screenshot 2023-04-10 201843](https://user-images.githubusercontent.com/8307131/231049772-32f6782e-75f3-4cb6-9626-616063a08f77.png) 
+* add certificate to the curl ``` curl -k https://aro.westus3.cloudapp.azure.com/ga --key client.key --cert client.crt``` you will be able to visit the pod
+
+ ![Screenshot 2023-04-10 201836](https://user-images.githubusercontent.com/8307131/231049979-5385a505-b86a-48fb-9a71-8245397d1197.png)
+
+
 # Reference 
 
 * https://devopscube.com/kubernetes-ingress-tutorial/
