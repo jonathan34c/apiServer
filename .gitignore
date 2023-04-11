@@ -6,3 +6,6 @@
 
 # ignore ALL .key files
 *.key
+
+# ignore ALL .key files
+*.csr
