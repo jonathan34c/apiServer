@@ -1,24 +1,23 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: ingress
+  name: ingress-mise
   namespace: ingress-basic
   annotations:
     # nginx.ingress.kubernetes.io/ssl-redirect: "false"
     # nginx.ingress.kubernetes.io/use-regex: "true"
-    # nginx.ingress.kubernetes.io/rewrite-target: /$2
-    nginx.ingress.kubernetes.io/auth-tls-secret: ingress-basic/aro-secret
-    nginx.ingress.kubernetes.io/auth-tls-verify-client: "on"
-    nginx.ingress.kubernetes.io/auth-tls-verify-depth: "1"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    # nginx.ingress.kubernetes.io/auth-tls-secret: ingress-basic/ca-secret
+    # nginx.ingress.kubernetes.io/auth-tls-verify-client: "on"
+    # nginx.ingress.kubernetes.io/auth-tls-verify-depth: "1"
 spec:
   ingressClassName: nginx
   tls:
   - hosts:
-    - aroga.westus3.cloudapp.azure.com
-    secretName: ingress-tls-csi
+    - aro.westus3.cloudapp.azure.com
+    secretName: sh.helm.release.v1.ingress-nginx.v5
   rules:
-  - host: aroga.westus3.cloudapp.azure.com
-    http:
+  - http:
       paths:
       - path: /rp(/|$)(.*)
         pathType: Prefix
