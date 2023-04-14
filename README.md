@@ -31,7 +31,7 @@
 * inject linkerd ```kubectl get deployments -n [namespace name] -o yaml | linkerd inject - | kubectl apply -f -```
 * checkout linkerd dashboard at ```linkerd dashboard```
 ![Screenshot 2023-04-03 105506](https://user-images.githubusercontent.com/8307131/229588898-21778d87-32d4-495e-86b3-ce2854a67aa5.png)
-* apply the authrization policy with https://github.com/jonathan34c/apiServer/blob/main/testauth.yaml https://github.com/jonathan34c/apiServer/blob/main/testcurl.yaml and https://github.com/jonathan34c/apiServer/blob/main/testnginxserver.yaml
+* apply the authrization policy with https://github.com/jonathan34c/apiServer/blob/main/linker_auth_policy.yaml https://github.com/jonathan34c/apiServer/blob/main/linker_server.yaml https://github.com/jonathan34c/apiServer/blob/main/linker_service_account.yaml
 
 * replace pod policy by adding server to pod yaml file
 ```
@@ -119,10 +119,13 @@ helm upgrade ingress-nginx ingress-nginx/ingress-nginx \
 ```
 * visit your set domaing by http://[domain name].westus3.cloudapp.azure.com
 
-# Trouble shooting 
-* if encounter ```ImagePullBackOff``` error for pod. Remember need to verified your docker image on azure using ```az aks update -n [resource-group name] -g [registry name] --attach-acr [registry name] ```
+
 
 # Create secret for tls
+* follows these steps before you start https://learn.microsoft.com/en-us/azure/aks/csi-secrets-store-driver https://learn.microsoft.com/en-us/azure/aks/csi-secrets-store-identity-access https://learn.microsoft.com/en-us/azure/aks/csi-secrets-store-nginx-tls
+* create a secret provider class https://github.com/jonathan34c/apiServer/blob/main/ingress_secret_provider.yaml
+* make sure you have keyvault yaml as well https://github.com/jonathan34c/apiServer/blob/main/keyvault.yaml
+* make sure to include "userAssignedIdentityID:", the tutorial has left out this part. 
 * folow [instruction](https://learn.microsoft.com/en-us/azure/aks/ingress-tls?tabs=azure-cli) to create secret for tls
 * note that since the helm has updated, the secret type will be "helm.sh/release.v1" instead of  kubernetes.io/tls
 * add the secret to tls [secret](https://github.com/jonathan34c/apiServer/blob/83cf8cc3e8c7c692a49ab0e8ac86a537b4efbf33/ingress.yaml#L18)
@@ -137,12 +140,20 @@ helm upgrade ingress-nginx ingress-nginx/ingress-nginx \
     nginx.ingress.kubernetes.io/auth-tls-secret: default/ca-secret
     nginx.ingress.kubernetes.io/auth-tls-verify-client: "on"
     nginx.ingress.kubernetes.io/auth-tls-verify-depth: "1"```
-* test tout by first visit the domain, it would request a certificate ``` curl -k https://aro.westus3.cloudapp.azure.com/ga```  ![Screenshot 2023-04-10 201843](https://user-images.githubusercontent.com/8307131/231049772-32f6782e-75f3-4cb6-9626-616063a08f77.png) 
-* add certificate to the curl ``` curl -k https://aro.westus3.cloudapp.azure.com/ga --key client.key --cert client.crt``` you will be able to visit the pod
+* test tout by first visit the domain, it would request a certificate ``` curl -k https://aroga.westus3.cloudapp.azure.com/ga```  ![Screenshot 2023-04-10 201843](https://user-images.githubusercontent.com/8307131/231049772-32f6782e-75f3-4cb6-9626-616063a08f77.png) 
+* add certificate to the curl ``` curl -k https://aroga.westus3.cloudapp.azure.com/ga --key client.key --cert client.crt``` you will be able to visit the pod
 
  ![Screenshot 2023-04-10 201836](https://user-images.githubusercontent.com/8307131/231049979-5385a505-b86a-48fb-9a71-8245397d1197.png)
 
 
+
+# Trouble shooting 
+* if encounter ```ImagePullBackOff``` error for pod. Remember need to verified your docker image on azure using ```az aks update -n [resource-group name] -g [registry name] --attach-acr [registry name] ```
+
+* if you had configured the azure key vault certificate wrong, you will get a secret like this. #DO NOT use this kind of secret 
+```
+sh.helm.release.v1.ingress-nginx.v4   helm.sh/release.v1   1      15h
+``` 
 # Reference 
 
 * https://devopscube.com/kubernetes-ingress-tutorial/
