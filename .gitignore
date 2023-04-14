@@ -9,3 +9,6 @@
 
 # ignore ALL .key files
 *.csr
+
+# ignore ALL .cer files
+*.cer
