@@ -1,0 +1,27 @@
+# TODO: MISE auth
+# kubectl apply -f ingress-rp.yaml
+# curl -L --resolve arorp.westus3.cloudapp.azure.com:443:{EXTERNAL-IP} https://arorp.westus3.p.azure.com/ -k
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-rp
+  namespace: ingress-basic
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - arorp.westus3.cloudapp.azure.com
+    secretName: ingress-tls-csi
+  rules:
+  - host: arorp.westus3.cloudapp.azure.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: rp
+            port:
+              number: 80
