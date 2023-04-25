@@ -1,0 +1,30 @@
+# Client secret auth
+# kubectl apply -f ingress-ga.yaml
+# curl -L --resolve aroga.westus3.cloudapp.azure.com:443:{EXTERNAL-IP} https://aroga.westus3.cloudapp.azure.com/ga -k
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-ga
+  namespace: ingress-basic
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/auth-tls-secret: ingress-basic/ca-secret1
+    nginx.ingress.kubernetes.io/auth-tls-verify-client: "on"
+    nginx.ingress.kubernetes.io/auth-tls-verify-depth: "1"
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - aroga.westus3.cloudapp.azure.com
+    secretName: ingress-tls-csi
+  rules:
+  - host: aroga.westus3.cloudapp.azure.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: ga
+            port:
+              number: 80
