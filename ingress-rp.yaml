@@ -1,6 +1,5 @@
-# TODO: MISE auth
 # kubectl apply -f ingress-rp.yaml
-# curl -L --resolve arorp.westus3.cloudapp.azure.com:443:{EXTERNAL-IP} https://arorp.westus3.p.azure.com/ -k
+# curl -L --resolve arorp.westus3.cloudapp.azure.com:443:{EXTERNAL-IP} https://arorp.westus3.cloudapp.azure.com/ -k -H "Authorization: Bearer {TOKEN}"
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -8,6 +7,18 @@ metadata:
   namespace: ingress-basic
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
+    
+    # https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/annotations/#external-authentication
+    nginx.ingress.kubernetes.io/auth-url: "http://mise-auth.ingress-basic.svc.cluster.local/ValidateRequest"
+    nginx.ingress.kubernetes.io/auth-keepalive: "3"
+    nginx.ingress.kubernetes.io/auth-method: POST
+
+    # add inputs for auth request
+    # https://identitydivision.visualstudio.com/DevEx/_git/MISE?path=/docs/container/InputOutput.md&version=GBmaster&_a=preview
+    # https://identitydivision.visualstudio.com/DevEx/_git/MISE?path=/docs/Container.md&version=GBmaster&_a=preview&anchor=send-a-request-to-a-mise-container
+    nginx.ingress.kubernetes.io/auth-snippet: |
+      proxy_set_header Original-Uri https://$host/;
+      proxy_set_header Original-Method GET;
 spec:
   ingressClassName: nginx
   tls:
