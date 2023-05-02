@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mise-appsettings
+  namespace: ingress-basic
+data:
+  appsettings.json: |-
+    {
+      "Version": "1",
+      "AzureAd": {
+        "Instance": "https://login.microsoftonline.com",
+        "TenantId": "72f988bf-86f1-41af-91ab-2d7cd011db47",
+        "ClientId": "{CLIENT-ID}",
+        "InboundPolicies": [
+        {
+            "Label": "my-inbound-policy",
+            "AuthenticationSchemes": [ "Bearer"],
+            "ValidAudiences" : [ 
+                "https://management.azure.com/"
+            ] 
+        }],
+      },
+      "AllowedHosts": "*",
+      "Kestrel": {
+        "Endpoints": {
+            "Http": {
+                "Url": "http://0.0.0.0:5000"
+            }
+        }
+      }
+    }
