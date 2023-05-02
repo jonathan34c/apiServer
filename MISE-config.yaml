@@ -9,7 +9,7 @@ data:
       "Version": "1",
       "AzureAd": {
         "Instance": "https://login.microsoftonline.com",
-        "TenantId": "72f988bf-86f1-41af-91ab-2d7cd011db47",
+        "TenantId": "{TENANT-ID}",
         "ClientId": "{CLIENT-ID}",
         "InboundPolicies": [
         {
