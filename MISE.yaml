@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: mise-auth
-  namespace: ingress-basic
+  namespace: jonachang
 spec:
   replicas: 1
   selector:
@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: mise
-        image: jonathan34c.azurecr.io/mise-sidecar:dev
+        image: aropocsvc.azurecr.io/mise:dev
         env:
         - name: MISE_APPSETTINGS_LOCATION
           value: "/app/etc/appsettings.json"
@@ -38,7 +38,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: mise-auth
-  namespace: ingress-basic  
+  namespace: jonachang  
 spec:
   type: ClusterIP
   ports:

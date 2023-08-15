@@ -2,15 +2,15 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: mise-appsettings
-  namespace: ingress-basic
+  namespace: jonachang
 data:
   appsettings.json: |-
     {
       "Version": "1",
       "AzureAd": {
         "Instance": "https://login.microsoftonline.com",
-        "TenantId": "{TENANT-ID}",
-        "ClientId": "{CLIENT-ID}",
+        "TenantId": "72f988bf-86f1-41af-91ab-2d7cd011db47",
+        "ClientId": "704c7dfd-4ed1-4732-95c0-04a44b0895a0",
         "InboundPolicies": [
         {
             "Label": "my-inbound-policy",

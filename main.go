@@ -1,8 +1,13 @@
 package main
 
 import (
+	"context"
 	"net/http"
 
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/cloud"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/policy"
+	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/gin-gonic/gin"
 
 	"fmt"
@@ -47,7 +52,7 @@ func main() {
 	// router.POST("/apps", postApps)
 
 	// router.Run(":8080")
-	test()
+	NewTokenCredential()
 }
 
 func getAppss(c *gin.Context) {
@@ -105,4 +110,17 @@ func test() {
 	// Regular expression
 
 	fmt.Println(text)
+}
+
+func NewTokenCredential() {
+	var cred azcore.TokenCredential
+	clientOpts := azcore.ClientOptions{Cloud: cloud.AzurePublic}
+	cred, err := azidentity.NewClientSecretCredential("72f988bf-86f1-41af-91ab-2d7cd011db47", "704c7dfd-4ed1-4732-95c0-04a44b0895a0", "gfM8Q~CKKWyc0drgMfHvHjsN~FECCeA9E0SUxbO~", &azidentity.ClientSecretCredentialOptions{ClientOptions: clientOpts})
+	tk, err := cred.GetToken(context.Background(), policy.TokenRequestOptions{Scopes: []string{"https://management.azure.com//.default"}})
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(tk)
+	fmt.Println("hi")
+
 }

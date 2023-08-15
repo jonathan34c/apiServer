@@ -8,7 +8,7 @@ metadata:
   namespace: ingress-basic
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
-    nginx.ingress.kubernetes.io/auth-tls-secret: ingress-basic/ca-secret1
+    nginx.ingress.kubernetes.io/auth-tls-secret: ingress-basic/ca-secret-ga
     nginx.ingress.kubernetes.io/auth-tls-verify-client: "on"
     nginx.ingress.kubernetes.io/auth-tls-verify-depth: "1"
 spec:
