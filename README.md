@@ -160,7 +160,7 @@ helm upgrade ingress-nginx ingress-nginx/ingress-nginx \
 # Istio Enable sidecar Injection
 * label the namespace ```kubectl label namespace jonachang istio-injection=enabled --overwrite=true```
 # Istio Deply sample app
-* Deploy sample application Product Page to namespace ``` kubectl apply -f productpage.yaml -n jonachang ```
+* Deploy sample application [Product](https://github.com/jonathan34c/apiServer/blob/main/product.yaml) Page to namespace ``` kubectl apply -f productpage.yaml -n jonachang ```
 * Verify deployment ```kubectl get deployment -n jonachang```
 * ![Screenshot 2023-08-16 122130](https://github.com/jonathan34c/apiServer/assets/8307131/babdeafd-0651-42b9-8dfe-b6570c3d88c3)
 * Notice that the Ready number is 2/2 not 1/1, the extra copy is the sidecar, so make sure you have 2/2 here
@@ -169,7 +169,7 @@ helm upgrade ingress-nginx ingress-nginx/ingress-nginx \
 * enable aks mesh gateway ```az aks mesh enable-ingress-gateway --resource-group $RESOURCE_GROUP --name $CLUSTER --ingress-gateway-type external```
 * check the loadbalancer is installed and IP address ``` kubectl get svc aks-istio-ingressgateway-external -n aks-istio-ingress```
 * ![Screenshot 2023-08-16 122627](https://github.com/jonathan34c/apiServer/assets/8307131/41303cd6-2f73-402a-a0f6-2704c4f10176)
-* apply the gateway yaml ```kubectl apply -f gateway-product.yaml -n jonachang```
+* apply the [gateway yaml](https://github.com/jonathan34c/apiServer/blob/main/gateway-product.yaml) ```kubectl apply -f gateway-product.yaml -n jonachang```
 * Verify the VM and gate way has been applied
 * ``` kubectl get gateway.networking.istio.io -n jonachang```
 * ![Screenshot 2023-08-16 123532](https://github.com/jonathan34c/apiServer/assets/8307131/353fef57-dfe8-4e89-a4e3-19cb0a7ad5c6)
