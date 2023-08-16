@@ -2,12 +2,9 @@ package main
 
 import (
 	"context"
+	"log"
 	"net/http"
 
-	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
-	"github.com/Azure/azure-sdk-for-go/sdk/azcore/cloud"
-	"github.com/Azure/azure-sdk-for-go/sdk/azcore/policy"
-	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/gin-gonic/gin"
 
 	"fmt"
@@ -47,16 +44,48 @@ var apps = []app{
 }
 
 func main() {
-	// router := gin.Default()
-	// router.GET("/apps", getAppss)
-	// router.POST("/apps", postApps)
+	router := gin.Default()
+	router.GET("/apps", getAppss)
+	router.POST("/apps", postApps)
 
-	// router.Run(":8080")
-	NewTokenCredential()
+	router.Run(":8080")
+	test()
 }
 
 func getAppss(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, apps)
+}
+
+func handler(w http.ResponseWriter, r *http.Request) {
+	ctx := context.Background()
+	t := extractToken(r.Header)
+	m := MiseRequestData{
+		MiseURL:        "http://localhost:5000/ValidateRequest",
+		OriginalURI:    "https://server/endpoint",
+		OriginalMethod: r.Method,
+		Token:          t,
+	}
+	req, err := createMiseHTTPRequest(ctx, m)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer resp.Body.Close()
+
+	log.Default().Println("Response status: ", resp.Status)
+
+	w.WriteHeader(resp.StatusCode)
+	switch resp.StatusCode {
+	case http.StatusOK:
+		fmt.Fprintln(w, "Authorized")
+	default:
+		fmt.Fprintln(w, "Unauthorized")
+	}
 }
 
 // title: Valid App 1
@@ -110,17 +139,4 @@ func test() {
 	// Regular expression
 
 	fmt.Println(text)
-}
-
-func NewTokenCredential() {
-	var cred azcore.TokenCredential
-	clientOpts := azcore.ClientOptions{Cloud: cloud.AzurePublic}
-	cred, err := azidentity.NewClientSecretCredential("72f988bf-86f1-41af-91ab-2d7cd011db47", "704c7dfd-4ed1-4732-95c0-04a44b0895a0", "gfM8Q~CKKWyc0drgMfHvHjsN~FECCeA9E0SUxbO~", &azidentity.ClientSecretCredentialOptions{ClientOptions: clientOpts})
-	tk, err := cred.GetToken(context.Background(), policy.TokenRequestOptions{Scopes: []string{"https://management.azure.com//.default"}})
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Println(tk)
-	fmt.Println("hi")
-
 }

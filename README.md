@@ -145,7 +145,9 @@ helm upgrade ingress-nginx ingress-nginx/ingress-nginx \
 
  ![Screenshot 2023-04-10 201836](https://user-images.githubusercontent.com/8307131/231049979-5385a505-b86a-48fb-9a71-8245397d1197.png)
 
-
+# Istio
+# Istio Setup 
+* Setup either by [bicep](https://learn.microsoft.com/en-us/azure/templates/microsoft.containerservice/2023-05-02-preview/managedclusters?pivots=deployment-language-bicep#servicemeshprofile) or [locally](https://learn.microsoft.com/en-us/azure/aks/istio-deploy-addon)
 
 # Trouble shooting 
 * if encounter ```ImagePullBackOff``` error for pod. Remember need to verified your docker image on azure using ```az aks update -n [resource-group name] -g [registry name] --attach-acr [registry name] ```
