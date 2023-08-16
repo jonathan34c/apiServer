@@ -145,7 +145,49 @@ helm upgrade ingress-nginx ingress-nginx/ingress-nginx \
 
  ![Screenshot 2023-04-10 201836](https://user-images.githubusercontent.com/8307131/231049979-5385a505-b86a-48fb-9a71-8245397d1197.png)
 
-
+# Istio
+# Istio Setup
+* Setup using [Manage Cluster](https://learn.microsoft.com/en-us/azure/templates/microsoft.containerservice/2023-05-02-preview/managedclusters?pivots=deployment-language-bicep#servicemeshprofile) or [Locally] (https://learn.microsoft.com/en-us/azure/aks/istio-deploy-addon)
+  ![Screenshot 2023-08-16 120402](https://github.com/jonathan34c/apiServer/assets/8307131/1ad0e96b-7591-4690-bfb0-023274ca3520)
+* Register AKS feature preview ```az feature register --namespace "Microsoft.ContainerService" --name "AzureServiceMeshPreview"```
+* Verify register correctly ```az feature show --namespace "Microsoft.ContainerService" --name "AzureServiceMeshPreview"```, ```az provider register --namespace Microsoft.ContainerService```
+# Install Istio for cluster 
+* ```az aks mesh enable --resource-group ${RESOURCE_GROUP} --name ${CLUSTER}```
+* Verify successful Installation ```az aks show --resource-group ${RESOURCE_GROUP} --name ${CLUSTER}  --query 'serviceMeshProfile.mode'```
+![Screenshot 2023-08-16 121403](https://github.com/jonathan34c/apiServer/assets/8307131/85031503-b62a-4dc4-b450-6f9b727cd4c5)
+* Get credential for the cluster ```az aks get-credentials --resource-group ${RESOURCE_GROUP} --name ${CLUSTER} --admin ```
+* Can Also see the istio pod by running ```kubectl get pods -n aks-istio-system```
+# Istio Enable sidecar Injection
+* label the namespace ```kubectl label namespace jonachang istio-injection=enabled --overwrite=true```
+# Istio Deply sample app
+* Deploy sample application Product Page to namespace ``` kubectl apply -f productpage.yaml -n jonachang ```
+* Verify deployment ```kubectl get deployment -n jonachang```
+* ![Screenshot 2023-08-16 122130](https://github.com/jonathan34c/apiServer/assets/8307131/babdeafd-0651-42b9-8dfe-b6570c3d88c3)
+* Notice that the Ready number is 2/2 not 1/1, the extra copy is the sidecar, so make sure you have 2/2 here
+  
+# Istio External gateway
+* enable aks mesh gateway ```az aks mesh enable-ingress-gateway --resource-group $RESOURCE_GROUP --name $CLUSTER --ingress-gateway-type external```
+* check the loadbalancer is installed and IP address ``` kubectl get svc aks-istio-ingressgateway-external -n aks-istio-ingress```
+* ![Screenshot 2023-08-16 122627](https://github.com/jonathan34c/apiServer/assets/8307131/41303cd6-2f73-402a-a0f6-2704c4f10176)
+* apply the gateway yaml ```kubectl apply -f gateway-product.yaml -n jonachang```
+* Verify the VM and gate way has been applied
+* ``` kubectl get gateway.networking.istio.io -n jonachang```
+* ![Screenshot 2023-08-16 123532](https://github.com/jonathan34c/apiServer/assets/8307131/353fef57-dfe8-4e89-a4e3-19cb0a7ad5c6)
+* ```  kubectl get virtualservice.networking.istio.io -n jonachang ```
+* ![Screenshot 2023-08-16 123549](https://github.com/jonathan34c/apiServer/assets/8307131/97573eda-b77b-41ba-88c3-993cbe47b6b8)
+* Obtained gateway address and port
+*
+```
+export INGRESS_NAME=istio-ingressgateway
+export INGRESS_NS=istio-system
+export INGRESS_HOST=$(kubectl -n "$INGRESS_NS" get service "$INGRESS_NAME" -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+export INGRESS_PORT=$(kubectl -n "$INGRESS_NS" get service "$INGRESS_NAME" -o jsonpath='{.spec.ports[?(@.name=="http2")].port}')
+export SECURE_INGRESS_PORT=$(kubectl -n "$INGRESS_NS" get service "$INGRESS_NAME" -o jsonpath='{.spec.ports[?(@.name=="https")].port}')
+export TCP_INGRESS_PORT=$(kubectl -n "$INGRESS_NS" get service "$INGRESS_NAME" -o jsonpath='{.spec.ports[?(@.name=="tcp")].port}')
+export GATEWAY_URL=$INGRESS_HOST:$INGRESS_PORT
+```
+* Test out the connection ``` curl -s "http://${GATEWAY_URL}/productpage" | grep -o "<title>.*</title>"```
+![Screenshot 2023-08-16 123947](https://github.com/jonathan34c/apiServer/assets/8307131/95fd2f93-10c6-4392-870a-8fc273d5db06)
 
 # Trouble shooting 
 * if encounter ```ImagePullBackOff``` error for pod. Remember need to verified your docker image on azure using ```az aks update -n [resource-group name] -g [registry name] --attach-acr [registry name] ```
